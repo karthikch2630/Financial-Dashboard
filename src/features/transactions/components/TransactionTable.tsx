@@ -7,6 +7,7 @@ import { Pencil, Trash2, TrendingUp, TrendingDown, Inbox } from "lucide-react";
 import { format } from "date-fns";
 import { type Transaction } from "../../../types/transaction";
 import { EditTransactionModal } from "./EditTransactionModal";
+import toast from "react-hot-toast";
 
 interface TransactionTableProps {
   transactions?: Transaction[];
@@ -108,7 +109,10 @@ export const TransactionTable = ({ transactions: propTransactions, isFullPage = 
                           </button>
                           
                           <button 
-                            onClick={() => deleteTransaction(t.id)}
+                            onClick={() => {
+                              deleteTransaction(t.id);
+                              toast.error("Transaction deleted.");
+                            }}
                             className="p-1.5 bg-gray-900/50 border border-gray-800 rounded-xl text-gray-500 hover:text-rose-400 hover:border-rose-500/50 transition-all"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

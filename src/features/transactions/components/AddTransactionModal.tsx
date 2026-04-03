@@ -4,6 +4,7 @@ import { transactionSchema } from "../../../schemas/transaction.schema";
 import { motion, AnimatePresence } from "framer-motion";
 import { IndianRupee, Tag, AlertCircle, TrendingUp, TrendingDown, X, ChevronDown } from "lucide-react";
 import { CustomDatePicker } from "../../../components/ui/CustomDatePicker";
+import toast from "react-hot-toast";
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -105,6 +106,7 @@ export const AddTransactionModal = ({ isOpen, onClose }: AddTransactionModalProp
       date: new Date().toISOString().split("T")[0] 
     });
     setError("");
+    toast.success("Transaction added successfully!");
     onClose(); 
   };
 

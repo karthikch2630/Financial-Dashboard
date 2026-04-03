@@ -1,4 +1,5 @@
-import {create} from "zustand";
+import { create } from "zustand";
+import { persist } from "zustand/middleware"; 
 
 export type Role = "viewer" | "admin";
 
@@ -7,7 +8,15 @@ type RoleState = {
   setRole: (role: Role) => void;
 };
 
-export const useRoleStore = create<RoleState>((set) => ({
-  role: "viewer",
-  setRole: (role) => set({ role }),
-}));
+
+export const useRoleStore = create<RoleState>()(
+  persist(
+    (set) => ({
+      role: "viewer",
+      setRole: (role) => set({ role }),
+    }),
+    {
+      name: "zorvyn-role", 
+    }
+  )
+);
