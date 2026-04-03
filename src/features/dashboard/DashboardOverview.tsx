@@ -1,6 +1,7 @@
 import { RecentTrasactions } from "../../components/transactions/RecentTransactions"; // Adjust import path
 import { CashFlowGauge } from "../../components/transactions/CashFlowGauge.tsx"; // Adjust import path
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 export const DashboardOverview = () => {
@@ -16,10 +17,10 @@ export const DashboardOverview = () => {
           {/* Header matching your reference image */}
           <div className="flex items-center justify-between mb-4 px-2">
             <h2 className="text-lg font-bold text-white tracking-tight">Latest Transactions</h2>
-            <button className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 group">
+            <Link to="/transactions" className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 group">
               See All 
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+            </Link>
           </div>
 
           {/* Render your compact table here */}

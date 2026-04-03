@@ -29,7 +29,6 @@ const cardThemes = {
   }
 };
 
-// ✨ FIXED: Added explicit ': Variants' type so TypeScript knows "spring" is a specific animation type
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.95 },
   show: { 
@@ -60,53 +59,59 @@ export const MetricCard = ({ type, label, amount, subLabel, badge, className = "
       variants={itemVariants}
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      className={`relative overflow-hidden bg-gradient-to-br from-gray-900 via-[#0a0a0a] to-black border border-gray-800 rounded-3xl p-6 md:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex flex-col justify-center min-h-[140px] ${className}`}
+      // ✅ Reduced padding on mobile (p-4) so the content has more room to breathe
+      className={`relative overflow-hidden bg-gradient-to-br from-gray-900 via-[#0a0a0a] to-black border border-gray-800 rounded-[1.5rem] p-4 md:p-6 shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex flex-col justify-between min-h-[120px] md:min-h-[140px] ${className}`}
     >
-      {/* Glassy Wave & Crosses Background */}
+      {/* Glassy Wave Background - Restricted width on mobile so it doesn't overlap text */}
       <svg
         viewBox="0 0 120 200"
         preserveAspectRatio="none"
-        className="absolute right-0 top-0 h-full w-[120px] pointer-events-none z-0"
+        className="absolute right-0 top-0 h-full w-1/2 max-w-[120px] pointer-events-none z-0 opacity-50 md:opacity-100"
       >
         <path d="M0,0 C60,40 20,120 80,200 L120,200 L120,0 Z" fill="rgba(255, 255, 255, 0.03)" />
         <path d="M30,0 C80,50 40,150 100,200 L120,200 L120,0 Z" fill="rgba(255, 255, 255, 0.02)" />
-        
         <path d="M80,50 L86,56 M86,50 L80,56" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
         <path d="M100,90 L106,96 M106,90 L100,96" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" />
         <path d="M85,150 L91,156 M91,150 L85,156" stroke="#f43f5e" strokeWidth="2.5" strokeLinecap="round" />
       </svg>
 
-      <div className="relative z-10 flex flex-col justify-center h-full">
+      <div className="relative z-10 flex flex-col h-full gap-3 md:gap-4">
         
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs md:text-sm font-bold tracking-[0.15em] text-gray-500 uppercase">
-            {label}
-          </p>
+        {/* 🔹 Top Row: Icon + Label */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 md:gap-3">
+            {/* Icon Wrapper - Scales perfectly from mobile to desktop */}
+            <div className="p-2 md:p-2.5 border-[2px] border-gray-700 bg-gray-800/50 rounded-xl flex-shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+              <Icon className={`w-4 h-4 md:w-5 md:h-5 stroke-[2.5] ${theme.iconColor}`} />
+            </div>
+            
+            {/* Label */}
+            <p className="text-[10px] md:text-[11px] font-black tracking-[0.15em] text-gray-500 uppercase leading-none mt-0.5">
+              {label}
+            </p>
+          </div>
+
+          {/* Optional Badge */}
           {badge && (
-            <span className="text-[10px] px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full font-bold uppercase tracking-wider border border-indigo-500/30">
+            <span className="text-[9px] px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full font-bold uppercase tracking-wider border border-indigo-500/30">
               {badge}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-4 md:gap-5">
-          {/* Icon */}
-          <div className="p-3 md:p-3.5 border-[2px] border-gray-700 bg-gray-800/50 rounded-2xl flex-shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-            <Icon className={`w-7 h-7 md:w-8 md:h-8 stroke-[2] ${theme.iconColor}`} />
-          </div>
-
-          {/* Amount */}
-          <div className="flex flex-col">
-            <h2 className={`text-3xl md:text-4xl font-black tracking-tight ${theme.amountColor}`}>
-              {amount}
-            </h2>
-            {subLabel && (
-              <p className={`text-xs md:text-sm font-semibold mt-1 ${theme.subLabelColor}`}>
-                {subLabel}
-              </p>
-            )}
-          </div>
+        {/* 🔹 Bottom Row: Amount + Sublabel */}
+        <div className="flex flex-col mt-auto">
+          {/* Amount - Uses 'truncate' so massive numbers don't break the box */}
+          <h2 className={`text-xl md:text-2xl lg:text-3xl font-black tracking-tight truncate ${theme.amountColor}`}>
+            {amount}
+          </h2>
+          
+          {/* Sublabel */}
+          {subLabel && (
+            <p className={`text-[10px] md:text-xs font-bold mt-1 truncate ${theme.subLabelColor}`}>
+              {subLabel}
+            </p>
+          )}
         </div>
 
       </div>

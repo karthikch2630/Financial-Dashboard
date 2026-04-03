@@ -4,16 +4,12 @@ import { TransactionTable } from "../../components/transactions/TransactionTable
 import { TransactionFilters } from "../../components/transactions/TransactionFilters";
 import { ExportModal } from "../../components/ui/ExportModal";
 import { motion, AnimatePresence } from "framer-motion";
+import { startOfMonth, subMonths, endOfDay, startOfDay, format } from "date-fns";
 import { ArrowUpRight, ArrowDownRight, Wallet, ReceiptText, Download, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const TransactionPage = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const handleExport = (range: string) => {
-    console.log("Exporting data for range:", range);
-    // Logic to filter transactions based on 'range' and convert to CSV
-    // ...
-    setIsExportModalOpen(false); // Close modal after trigger
-  };
+  
   const filteredTransactions = useFilteredTransactions();
 
   // 🔹 Pagination State
@@ -52,6 +48,61 @@ export const TransactionPage = () => {
 
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(val);
+
+
+
+  const handleExport = (range: "all" | "current_month" | "last_3_months" | "custom", customDates?: { from: Date; to: Date }) => {
+    const today = new Date();
+
+    // 1. Filter the transactions based on the selected date range
+    const dataToExport = filteredTransactions.filter((t) => {
+      const tDate = new Date(t.date);
+
+      if (range === "current_month") {
+        return tDate >= startOfMonth(today) && tDate <= endOfDay(today);
+      }
+      else if (range === "last_3_months") {
+        // Last 3 months means from the start of the month 2 months ago up to today
+        return tDate >= startOfMonth(subMonths(today, 2)) && tDate <= endOfDay(today);
+      }
+      else if (range === "custom" && customDates) {
+        return tDate >= startOfDay(customDates.from) && tDate <= endOfDay(customDates.to);
+      }
+
+      return true; // For "all"
+    });
+
+    // 2. Prevent empty exports
+    if (dataToExport.length === 0) {
+      alert("No transactions found for the selected range.");
+      return;
+    }
+
+    // 3. Generate CSV Content
+    const headers = ["Date", "Category", "Type", "Amount"];
+    const csvRows = dataToExport.map((t) =>
+      `"${format(new Date(t.date), "yyyy-MM-dd")}","${t.category}","${t.type}","${t.amount}"`
+    );
+
+    // Combine headers and rows with newlines
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
+
+    // 4. Trigger the Download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `FinanceOS_Export_${range}_${format(today, "yyyyMMdd")}.csv`);
+    document.body.appendChild(link);
+
+    link.click(); // Programmatically click the link to download
+
+    // Cleanup
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setIsExportModalOpen(false); // Close Modal on success
+  };
 
   return (
     <>
@@ -147,6 +198,14 @@ export const TransactionPage = () => {
         )}
       </motion.div>
 
+      <button
+        onClick={() => setIsExportModalOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-800 rounded-xl text-gray-300 hover:text-white transition-all text-sm font-bold shadow-lg"
+      >
+        <Download className="w-4 h-4" /> Export CSV
+      </button>
+
+      {/* Modal placed at the bottom of the component */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}

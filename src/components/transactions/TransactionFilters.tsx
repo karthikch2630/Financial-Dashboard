@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { useUIStore } from "../../store/uiStore";
-import { 
-  Search, ArrowUpDown, Check, SlidersHorizontal, 
+import {
+  Search, ArrowUpDown, Check, SlidersHorizontal,
   X, CalendarDays, CircleDollarSign, TrendingUp, TrendingDown, Layers
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ALL_CATEGORIES = [
-  "Bonus", "Debt Repayment", "Dividends", "Entertainment", "Food & Dining", "Freelance",
-  "Groceries", "Healthcare", "Investments", "Refund", "Rent", "Salary", "Shopping",
-  "Sold Items", "Subscriptions", "Transport", "Travel", "Utilities", "Other"
+// ✅ 1. Split categories exactly based on your mock data
+const INCOME_CATEGORIES = [
+  "Bonus", "Dividends", "Freelance", "Other", "Refund", "Salary"
+];
+
+const EXPENSE_CATEGORIES = [
+  "Food", "Groceries", "Healthcare", "Rent", "Transport", "Utilities"
 ];
 
 const SORT_OPTIONS = [
@@ -59,9 +62,16 @@ export const TransactionFilters = () => {
 
   const activeFilterCount = (category !== "" ? 1 : 0) + (type !== "" ? 1 : 0);
 
+  // ✅ 2. Determine which categories to show based on the selected Type
+  const displayCategories = type === "income" 
+    ? INCOME_CATEGORIES 
+    : type === "expense" 
+      ? EXPENSE_CATEGORIES 
+      : [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES].sort(); // Combine and sort alphabetically for 'All'
+
   return (
     <div className="flex items-center gap-2 w-full" ref={containerRef}>
-      
+
       {/* 🔹 1. Smart Search Bar */}
       <div className="relative group flex-1 z-10">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-500 group-focus-within:text-emerald-400 transition-colors" />
@@ -91,18 +101,17 @@ export const TransactionFilters = () => {
       <div className="relative z-20">
         <button
           onClick={() => toggleDropdown("filters")}
-          className={`relative flex items-center gap-2 px-3 md:px-5 py-2.5 md:py-3.5 rounded-2xl border transition-all text-sm font-medium shadow-inner ${
-            openDropdown === "filters" || activeFilterCount > 0
-              ? "bg-gray-900 border-gray-700 text-white shadow-[0_0_20px_rgba(16,185,129,0.05)]" 
+          className={`relative flex items-center gap-2 px-3 md:px-5 py-2.5 md:py-3.5 rounded-2xl border transition-all text-sm font-medium shadow-inner ${openDropdown === "filters" || activeFilterCount > 0
+              ? "bg-gray-900 border-gray-700 text-white shadow-[0_0_20px_rgba(16,185,129,0.05)]"
               : "bg-black border-gray-800 text-gray-400 hover:text-gray-200 hover:bg-gray-900/50"
-          }`}
+            }`}
         >
           <SlidersHorizontal className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${openDropdown === "filters" ? "text-emerald-400" : ""}`} />
           <span className="hidden sm:inline tracking-wide">Filters</span>
-          
+
           <AnimatePresence>
             {activeFilterCount > 0 && (
-              <motion.span 
+              <motion.span
                 initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
                 className="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_12px_rgba(16,185,129,0.8)] border border-black"
               >
@@ -124,6 +133,7 @@ export const TransactionFilters = () => {
               {/* ✨ Segmented Control for Type */}
               <div className="p-4 border-b border-gray-800/60 bg-gray-900/40">
                 <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 pl-1">Transaction Type</h3>
+                
                 <div className="flex p-1 bg-black rounded-xl border border-gray-800 relative shadow-inner">
                   {TYPE_OPTIONS.map((opt) => {
                     const isActive = type === opt.value;
@@ -131,22 +141,20 @@ export const TransactionFilters = () => {
                     return (
                       <button
                         key={opt.value}
-                        // ✅ Added setOpenDropdown(null) to close panel on click
                         onClick={() => {
                           setType(opt.value as "" | "income" | "expense");
-                          setOpenDropdown(null);
+                          setCategory(""); // ✅ Clear category if they switch tabs so it doesn't get stuck on invalid combos
                         }}
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all z-10 ${
-                          isActive ? "text-white" : "text-gray-500 hover:text-gray-300"
-                        }`}
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all z-10 ${isActive ? "text-white" : "text-gray-500 hover:text-gray-300"
+                          }`}
                       >
                         <Icon className={`w-3.5 h-3.5 ${isActive && opt.value === 'income' ? 'text-emerald-400' : isActive && opt.value === 'expense' ? 'text-rose-400' : ''}`} />
                         {opt.label}
                       </button>
                     );
                   })}
-                  
-                  <div 
+
+                  <div
                     className="absolute top-1 bottom-1 w-[calc(33.33%-2px)] rounded-lg bg-gray-800 border border-gray-700 shadow-md transition-all duration-300 ease-out"
                     style={{
                       left: type === "" ? "4px" : type === "income" ? "calc(33.33% + 2px)" : "calc(66.66% - 1px)"
@@ -158,7 +166,7 @@ export const TransactionFilters = () => {
               {/* ✨ Staggered Category List */}
               <div className="p-2 py-3">
                 <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 px-3">Category</h3>
-                <motion.ul 
+                <motion.ul
                   variants={listVariants}
                   initial="hidden"
                   animate="show"
@@ -166,31 +174,28 @@ export const TransactionFilters = () => {
                 >
                   <motion.li
                     variants={itemVariants}
-                    // ✅ Added setOpenDropdown(null) to close panel on click
                     onClick={() => {
                       setCategory("");
                       setOpenDropdown(null);
                     }}
-                    className={`px-3 py-2.5 mx-1 mb-1 text-sm font-medium rounded-xl cursor-pointer transition-colors flex items-center justify-between group ${
-                      category === "" ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
-                    }`}
+                    className={`px-3 py-2.5 mx-1 mb-1 text-sm font-medium rounded-xl cursor-pointer transition-colors flex items-center justify-between group ${category === "" ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
+                      }`}
                   >
                     All Categories
                     {category === "" && <Check className="w-4 h-4 text-emerald-400" />}
                   </motion.li>
-                  
-                  {ALL_CATEGORIES.map((cat) => (
+
+                  {/* ✅ 3. Map over the dynamic 'displayCategories' array */}
+                  {displayCategories.map((cat) => (
                     <motion.li
                       variants={itemVariants}
                       key={cat}
-                      // ✅ Added setOpenDropdown(null) to close panel on click
                       onClick={() => {
                         setCategory(cat);
                         setOpenDropdown(null);
                       }}
-                      className={`px-3 py-2.5 mx-1 mb-1 text-sm font-medium rounded-xl cursor-pointer transition-all flex items-center justify-between ${
-                        category === cat ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
-                      }`}
+                      className={`px-3 py-2.5 mx-1 mb-1 text-sm font-medium rounded-xl cursor-pointer transition-all flex items-center justify-between ${category === cat ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
+                        }`}
                     >
                       <div className="flex items-center gap-2.5">
                         <div className={`w-1.5 h-1.5 rounded-full ${category === cat ? 'bg-emerald-400' : 'bg-gray-700'}`} />
@@ -210,11 +215,10 @@ export const TransactionFilters = () => {
       <div className="relative z-20">
         <button
           onClick={() => toggleDropdown("sort")}
-          className={`flex items-center justify-center p-2.5 md:p-3.5 rounded-2xl border transition-all shadow-inner ${
-            openDropdown === "sort" 
-              ? "bg-gray-900 border-gray-700 text-white shadow-[0_0_20px_rgba(16,185,129,0.05)]" 
+          className={`flex items-center justify-center p-2.5 md:p-3.5 rounded-2xl border transition-all shadow-inner ${openDropdown === "sort"
+              ? "bg-gray-900 border-gray-700 text-white shadow-[0_0_20px_rgba(16,185,129,0.05)]"
               : "bg-black border-gray-800 text-gray-400 hover:text-gray-200 hover:bg-gray-900/50"
-          }`}
+            }`}
         >
           <ArrowUpDown className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${openDropdown === "sort" ? "text-emerald-400" : ""}`} />
         </button>
@@ -235,9 +239,8 @@ export const TransactionFilters = () => {
                     <li
                       key={opt.value}
                       onClick={() => { setSortBy(opt.value); setOpenDropdown(null); }}
-                      className={`px-3 py-3 text-sm font-medium rounded-xl cursor-pointer transition-colors flex items-center justify-between ${
-                        sortBy === opt.value ? "text-emerald-300 bg-emerald-500/15 border border-emerald-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
-                      }`}
+                      className={`px-3 py-3 text-sm font-medium rounded-xl cursor-pointer transition-colors flex items-center justify-between ${sortBy === opt.value ? "text-emerald-300 bg-emerald-500/15 border border-emerald-500/20" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/60 border border-transparent"
+                        }`}
                     >
                       <div className="flex items-center gap-2.5">
                         <Icon className={`w-4 h-4 ${sortBy === opt.value ? 'text-emerald-400' : 'text-gray-500'}`} />

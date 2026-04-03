@@ -29,21 +29,20 @@ export const SummaryCards = () => {
       initial="hidden"
       animate="show"
       className={`grid gap-4 md:gap-5 w-full transition-all duration-500 ease-in-out
-      ${role === "admin" ? "grid-cols-1 lg:grid-cols-4" : "grid-cols-1 md:grid-cols-3"}`}
+      ${role === "admin" ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 md:grid-cols-3"}`}
     >
       <AnimatePresence mode="popLayout">
         
-        {/* 1. Balance Card */}
+        {/* 1. Balance Card (Standard width) */}
         <MetricCard 
           key="balance"
           type="balance"
           label="Current Balance"
           amount={formatCurrency(balance)}
           subLabel="Total Available Funds"
-          className={role !== "admin" ? "md:col-span-1" : ""}
         />
 
-        {/* 2. Income Card */}
+        {/* 2. Income Card (Standard width) */}
         <MetricCard 
           key="income" 
           type="income"
@@ -52,13 +51,14 @@ export const SummaryCards = () => {
           subLabel="Cash Inflow"
         />
 
-        {/* 3. Expense Card */}
+        {/* 3. Expense Card (Spans full width on mobile if viewer, normal on desktop) */}
         <MetricCard 
           key="expenses" 
           type="expense"
           label="Total Expense" 
           amount={formatCurrency(expenses)} 
           subLabel="Cash Outflow"
+          className={role !== "admin" ? "col-span-2 md:col-span-1" : ""}
         />
 
         {/* 4. Admin Card (Conditional) */}

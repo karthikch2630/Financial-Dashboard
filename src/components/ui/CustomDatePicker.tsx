@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, isAfter, endOfDay } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 
@@ -15,7 +15,6 @@ export const CustomDatePicker = ({ value, onChange }: CustomDatePickerProps) => 
 
   const selectedDate = value ? new Date(value) : null;
 
-  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
@@ -26,7 +25,6 @@ export const CustomDatePicker = ({ value, onChange }: CustomDatePickerProps) => 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // Calendar Logic
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const startDate = startOfWeek(monthStart);
@@ -48,70 +46,69 @@ export const CustomDatePicker = ({ value, onChange }: CustomDatePickerProps) => 
   };
 
   return (
-    <div className="relative group" ref={popupRef}>
+    <div className="relative" ref={popupRef}>
       {/* 🔹 The Input Trigger */}
-      <CalendarIcon className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors z-10 pointer-events-none ${isOpen ? 'text-indigo-400' : 'text-gray-500 group-focus-within:text-indigo-400'}`} />
-      
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-gray-900/50 border text-white font-medium rounded-2xl pl-12 pr-4 py-3.5 
-        flex items-center justify-between cursor-pointer transition-all shadow-inner
-        ${isOpen ? "border-indigo-500 bg-gray-900" : "border-gray-800 hover:border-gray-700"}`}
+        className={`relative w-full bg-gray-950 border text-white text-xs font-bold rounded-xl pl-10 pr-4 py-2.5 flex items-center cursor-pointer transition-all ${isOpen ? "border-indigo-500 ring-1 ring-indigo-500/20" : "border-white/10 hover:border-white/20"}`}
       >
-        <span>{selectedDate ? format(selectedDate, "PPP") : "Select a date"}</span>
+        <CalendarIcon className={`absolute left-3 w-4 h-4 transition-colors ${isOpen ? 'text-indigo-400' : 'text-gray-500'}`} />
+        <span className="truncate">
+          {selectedDate ? format(selectedDate, "MMM dd, yyyy") : "Select Date"}
+        </span>
       </div>
 
       {/* 🔹 The Calendar Popup */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute bottom-full mb-3 left-0 z-50 p-5 bg-[#0a0a0a] border border-gray-800 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-[320px]"
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 z-[100] p-4 bg-[#111] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] w-[260px] select-none"
           >
-            {/* Header: Month / Year / Arrows */}
-            <div className="flex justify-between items-center mb-6 px-1">
-              <button onClick={prevMonth} className="text-gray-400 hover:text-white transition-colors p-1 rounded-md hover:bg-gray-800">
-                <ChevronLeft className="w-5 h-5" />
+            <div className="flex justify-between items-center mb-4">
+              <button onClick={prevMonth} className="p-1 hover:bg-white/5 rounded-lg text-gray-500 hover:text-white transition-colors">
+                <ChevronLeft className="w-4 h-4" />
               </button>
-              
-              <div className="flex gap-2 text-white font-semibold text-lg tracking-wide">
-                <span>{format(currentMonth, "MMMM")}</span>
-                <span className="text-gray-400">{format(currentMonth, "yyyy")}</span>
+              <div className="text-[13px] font-bold text-white tracking-tight">
+                {format(currentMonth, "MMMM yyyy")}
               </div>
-
-              <button onClick={nextMonth} className="text-gray-400 hover:text-white transition-colors p-1 rounded-md hover:bg-gray-800">
-                <ChevronRight className="w-5 h-5" />
+              <button onClick={nextMonth} className="p-1 hover:bg-white/5 rounded-lg text-gray-500 hover:text-white transition-colors">
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Weekdays Row */}
-            <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                <div key={day} className="text-sm font-medium text-gray-500">
+            <div className="grid grid-cols-7 mb-2">
+              {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
+                <div key={i} className="text-[10px] font-black text-gray-600 text-center">
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-y-2 gap-x-1">
+            <div className="grid grid-cols-7 gap-1">
               {days.map((day, idx) => {
                 const isSelected = selectedDate && isSameDay(day, selectedDate);
                 const isCurrentMonth = isSameMonth(day, currentMonth);
                 const isTodayDate = isToday(day);
+                
+                // ✅ Logic to disable future dates
+                const isFutureDate = isAfter(day, endOfDay(new Date()));
 
                 return (
                   <button
                     key={idx}
-                    onClick={() => handleDateClick(day)}
+                    type="button"
+                    // ✅ Prevent click if date is in the future
+                    onClick={() => !isFutureDate && handleDateClick(day)}
+                    disabled={isFutureDate}
                     className={`
-                      w-10 h-10 mx-auto flex items-center justify-center rounded-full text-sm transition-all duration-200
-                      ${!isCurrentMonth ? "text-gray-700 hover:text-gray-400" : "text-gray-200 hover:bg-gray-800"}
-                      ${isTodayDate && !isSelected ? "text-indigo-400 font-bold" : ""}
-                      ${isSelected ? "bg-indigo-600 text-white font-bold shadow-[0_0_15px_rgba(79,70,229,0.4)]" : ""}
+                      aspect-square flex items-center justify-center rounded-lg text-[11px] transition-all
+                      ${!isCurrentMonth || isFutureDate ? "text-gray-800 pointer-events-none" : "text-gray-300 hover:bg-white/10"}
+                      ${isTodayDate && !isSelected ? "text-indigo-400 font-bold underline decoration-2 underline-offset-2" : ""}
+                      ${isSelected ? "bg-indigo-600 font-bold !text-white shadow-lg" : ""}
                     `}
                   >
                     {format(day, "d")}
