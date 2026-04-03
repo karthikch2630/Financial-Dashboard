@@ -5,7 +5,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useTransactionStore } from "../../store/transactionStore";
+import { useTransactionStore } from "../../../store/transactionStore";
 import { motion } from "framer-motion";
 
 const CATEGORY_COLORS = [

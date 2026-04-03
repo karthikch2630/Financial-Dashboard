@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useFilteredTransactions } from "../../hooks/useFilteredTransactions";
+import { useFilteredTransactions } from "../../transactions/hooks/useFilteredTransactions";
 import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 

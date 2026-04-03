@@ -1,5 +1,5 @@
-import { RecentTrasactions } from "../../components/transactions/RecentTransactions"; // Adjust import path
-import { CashFlowGauge } from "../../components/transactions/CashFlowGauge.tsx"; // Adjust import path
+import { RecentTrasactions } from "../../transactions/components/RecentTransactions"; // Adjust import path
+import { CashFlowGauge } from "../charts/CashFlowGauge.tsx"; // Adjust import path
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 

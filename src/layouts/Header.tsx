@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { RoleSwitcher } from "../../features/role/RoleSwitcher";
-import { useRoleStore } from "../../store/roleStore";
+import { RoleSwitcher } from "../features/role/RoleSwitcher";
+import { useRoleStore } from "../store/roleStore";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
-import { AddTransactionModal } from "../../features/transactions/AddTransactionModal";
+import { AddTransactionModal } from "../features/transactions/components/AddTransactionModal";
 import { Menu, Moon, Sun } from "lucide-react"; // ✅ Added icons
 
 interface HeaderProps {

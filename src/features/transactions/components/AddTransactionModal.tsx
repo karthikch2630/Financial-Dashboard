@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useTransactionStore } from "../../store/transactionStore";
-import { transactionSchema } from "../../schemas/transaction.schema";
+import { useTransactionStore } from "../../../store/transactionStore";
+import { transactionSchema } from "../../../schemas/transaction.schema";
 import { motion, AnimatePresence } from "framer-motion";
 import { IndianRupee, Tag, AlertCircle, TrendingUp, TrendingDown, X, ChevronDown } from "lucide-react";
-import { CustomDatePicker } from "../../components/ui/CustomDatePicker";
+import { CustomDatePicker } from "../../../components/ui/CustomDatePicker";
 
 interface AddTransactionModalProps {
   isOpen: boolean;

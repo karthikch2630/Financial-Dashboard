@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useUIStore } from "../../store/uiStore";
+import { useUIStore } from "../../../store/uiStore";
 import {
   Search, ArrowUpDown, Check, SlidersHorizontal,
   X, CalendarDays, CircleDollarSign, TrendingUp, TrendingDown, Layers

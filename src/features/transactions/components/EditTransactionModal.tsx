@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Receipt } from "lucide-react";
-import { useTransactionStore } from "../../store/transactionStore";
-import { type Transaction } from "../../types/transaction";
-import { CustomDatePicker } from "../../components/ui/CustomDatePicker";
+import { useTransactionStore } from "../../../store/transactionStore";
+import { type Transaction } from "../../../types/transaction";
+import { CustomDatePicker } from "../../../components/ui/CustomDatePicker";
 
 interface EditTransactionModalProps {
   transaction: Transaction | null;

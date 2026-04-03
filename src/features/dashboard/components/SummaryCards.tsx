@@ -1,7 +1,7 @@
-import { useTransactionStore } from "../../store/transactionStore";
-import { useRoleStore } from "../../store/roleStore";
+import { useTransactionStore } from "../../../store/transactionStore";
+import { useRoleStore } from "../../../store/roleStore";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { MetricCard } from "../../components/ui/MetricCard";
+import { MetricCard } from "../../../components/ui/MetricCard";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },

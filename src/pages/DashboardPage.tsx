@@ -1,7 +1,7 @@
-import { SummaryCards } from "./SummaryCards";
-import { BalanceChart } from "../../components/charts/BalanceCharts";
-import { CategoryChart } from "../../components/charts/CategoryCharts";
-import { DashboardOverview } from "./DashboardOverview";
+import { SummaryCards } from "../features/dashboard/components/SummaryCards";
+import { BalanceChart } from "../features/dashboard/charts/BalanceCharts";
+import { CategoryChart } from "../features/dashboard/charts/CategoryCharts";
+import { DashboardOverview } from "../features/dashboard/components/DashboardOverview";
 
 export const DashboardPage = () => {
   return (

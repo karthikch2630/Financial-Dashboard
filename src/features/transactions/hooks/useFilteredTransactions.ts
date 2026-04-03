@@ -1,5 +1,5 @@
-import { useTransactionStore } from "../store/transactionStore";
-import { useUIStore } from "../store/uiStore";
+import { useTransactionStore } from "../../../store/transactionStore";
+import { useUIStore } from "../../../store/uiStore";
 
 export const useFilteredTransactions = () => {
   const { transactions } = useTransactionStore();

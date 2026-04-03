@@ -1,6 +1,6 @@
-import { useFilteredTransactions } from "../../hooks/useFilteredTransactions";
-import { useRoleStore } from "../../store/roleStore";
-import { useTransactionStore } from "../../store/transactionStore";
+import { useFilteredTransactions } from "../hooks/useFilteredTransactions";
+import { useRoleStore } from "../../../store/roleStore";
+import { useTransactionStore } from "../../../store/transactionStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, TrendingUp, TrendingDown, Inbox } from "lucide-react";
 import { format } from "date-fns";

@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { useFilteredTransactions } from "../../hooks/useFilteredTransactions";
-import { TransactionTable } from "../../components/transactions/TransactionTable";
-import { TransactionFilters } from "../../components/transactions/TransactionFilters";
-import { ExportModal } from "../../components/ui/ExportModal";
+import { useFilteredTransactions } from "../features/transactions/hooks/useFilteredTransactions";
+import { TransactionTable } from "../features/transactions/components/TransactionTable";
+import { TransactionFilters } from "../features/transactions/components/TransactionFilters";
+import { ExportModal } from "../components/ui/ExportModal";
 import { motion, AnimatePresence } from "framer-motion";
 import { startOfMonth, subMonths, endOfDay, startOfDay, format } from "date-fns";
 import { ArrowUpRight, ArrowDownRight, Wallet, ReceiptText, Download, ChevronLeft, ChevronRight } from "lucide-react";

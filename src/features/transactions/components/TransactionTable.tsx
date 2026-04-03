@@ -1,12 +1,12 @@
 import { useState } from "react"; // ✅ Added useState
-import { useFilteredTransactions } from "../../hooks/useFilteredTransactions";
-import { useRoleStore } from "../../store/roleStore";
-import { useTransactionStore } from "../../store/transactionStore";
+import { useFilteredTransactions } from "../hooks/useFilteredTransactions";
+import { useRoleStore } from "../../../store/roleStore";
+import { useTransactionStore } from "../../../store/transactionStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, TrendingUp, TrendingDown, Inbox } from "lucide-react";
 import { format } from "date-fns";
-import { type Transaction } from "../../types/transaction";
-import { EditTransactionModal } from "../../features/transactions/EditTransactionModal";
+import { type Transaction } from "../../../types/transaction";
+import { EditTransactionModal } from "./EditTransactionModal";
 
 interface TransactionTableProps {
   transactions?: Transaction[];
