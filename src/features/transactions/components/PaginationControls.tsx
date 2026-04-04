@@ -10,11 +10,11 @@ export const PaginationControls = ({ currentPage, totalPages, setCurrentPage }: 
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 sm:pt-6 border-t border-gray-800/60">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 sm:pt-6 border-t border-gray-200 dark:border-gray-800/60 transition-colors duration-300">
       
       {/* 🔹 Desktop Text (Hidden on Mobile) */}
-      <p className="hidden sm:block text-sm text-gray-500 font-medium">
-        Page <span className="text-white">{currentPage}</span> of {totalPages}
+      <p className="hidden sm:block text-sm text-gray-500 dark:text-gray-400 font-medium transition-colors">
+        Page <span className="text-gray-900 dark:text-white font-bold">{currentPage}</span> of {totalPages}
       </p>
 
       {/* 🔹 Controls Container (Stretches 100% width on Mobile) */}
@@ -24,15 +24,15 @@ export const PaginationControls = ({ currentPage, totalPages, setCurrentPage }: 
         <button 
           onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
           disabled={currentPage === 1} 
-          className="flex items-center gap-1 p-2 sm:p-2.5 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 disabled:opacity-30 hover:bg-gray-800 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-1 p-2 sm:p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
         >
           <ChevronLeft className="w-5 h-5" />
           <span className="sm:hidden pr-2 text-sm font-semibold">Prev</span>
         </button>
 
         {/* 🔹 Mobile Page Indicator (Hidden on Desktop) */}
-        <div className="sm:hidden text-sm font-medium text-gray-500">
-          <span className="text-white font-bold">{currentPage}</span> / {totalPages}
+        <div className="sm:hidden text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors">
+          <span className="text-gray-900 dark:text-white font-bold">{currentPage}</span> / {totalPages}
         </div>
 
         {/* 🔹 Desktop Page Numbers (Hidden on Mobile, wraps on Tablet) */}
@@ -43,8 +43,8 @@ export const PaginationControls = ({ currentPage, totalPages, setCurrentPage }: 
               onClick={() => setCurrentPage(i + 1)} 
               className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
                 currentPage === i + 1 
-                  ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]" 
-                  : "text-gray-500 hover:bg-gray-800 hover:text-white"
+                  ? "bg-emerald-500 text-white shadow-md dark:shadow-[0_0_15px_rgba(16,185,129,0.3)]" 
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               {i + 1}
@@ -56,7 +56,7 @@ export const PaginationControls = ({ currentPage, totalPages, setCurrentPage }: 
         <button 
           onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
           disabled={currentPage === totalPages} 
-          className="flex items-center gap-1 p-2 sm:p-2.5 rounded-xl border border-gray-800 bg-gray-900/50 text-gray-400 disabled:opacity-30 hover:bg-gray-800 hover:text-white transition-all active:scale-95"
+          className="flex items-center gap-1 p-2 sm:p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
         >
           <span className="sm:hidden pl-2 text-sm font-semibold">Next</span>
           <ChevronRight className="w-5 h-5" />

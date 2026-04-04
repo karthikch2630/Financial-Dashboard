@@ -34,14 +34,15 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-gray-950 border border-gray-800 p-3 rounded-xl shadow-2xl flex items-center gap-3">
+      // ✅ Updated Tooltip to match the glassmorphism theme
+      <div className="bg-white/80 dark:bg-[#050505]/80 backdrop-blur-md border border-emerald-500/20 p-3 rounded-xl shadow-xl flex items-center gap-3 transition-colors">
         <div 
-          className="w-3 h-3 rounded-full shadow-sm" 
-          style={{ backgroundColor: data.fill }} 
+          className="w-3 h-3 rounded-full shadow-[0_0_8px_currentColor]" 
+          style={{ backgroundColor: data.fill, color: data.fill }} 
         />
         <div>
-          <p className="text-gray-300 text-xs font-medium uppercase tracking-wider">{data.name}</p>
-          <p className="text-white font-bold text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wider">{data.name}</p>
+          <p className="text-gray-900 dark:text-white font-bold text-sm">
             {new Intl.NumberFormat("en-IN", {
               style: "currency",
               currency: "INR",
@@ -58,21 +59,14 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 export const CategoryChart = () => {
   const { transactions } = useTransactionStore();
 
-  // ✅ Calculate the "Last 5 Months" boundary
   const now = new Date();
-  
-  // Start Date: 1st day of the month, 4 months ago (Current month + 4 previous = 5 months total)
   const startDate = new Date(now.getFullYear(), now.getMonth() - 4, 1);
-  
-  // End Date: Last day of the current month
   const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  // Format a clean label like "Dec 2025 - Apr 2026"
   const startLabel = startDate.toLocaleString("default", { month: "short", year: "numeric" });
   const endLabel = endDate.toLocaleString("default", { month: "short", year: "numeric" });
   const dateRangeText = `${startLabel} - ${endLabel}`;
 
-  // ✅ Filter by "expense" AND within the 5-month window
   const expenses = transactions.filter((t) => {
     const tDate = new Date(t.date);
     return (
@@ -102,8 +96,12 @@ export const CategoryChart = () => {
 
   if (sortedChartData.length === 0) {
     return (
-      <div className="bg-[#0a0a0a] p-6 rounded-2xl border border-gray-800 shadow-lg h-[350px] flex items-center justify-center text-gray-500">
-        No expenses recorded for {dateRangeText}.
+      // ✅ Empty state perfectly matched to the pure glassmorphism design
+      <div className="relative w-full h-[350px] sm:h-[400px] flex items-center justify-center p-5 sm:p-6 rounded-3xl bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-2xl border border-white/60 dark:border-emerald-500/20 shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(16,185,129,0.1)] overflow-hidden transition-colors duration-300">
+        <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-emerald-500/5 to-transparent dark:from-emerald-500/20 dark:via-emerald-500/5 pointer-events-none z-0" />
+        <span className="relative z-10 text-gray-500 dark:text-gray-400 font-medium">
+          No expenses recorded for {dateRangeText}.
+        </span>
       </div>
     );
   }
@@ -113,68 +111,79 @@ export const CategoryChart = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
-      className="bg-[#0a0a0a] p-4 sm:p-6 rounded-2xl border border-gray-800 shadow-lg h-[350px] sm:h-[400px] flex flex-col"
+      // ✅ 1. The Pure Glassmorphism Container applied directly to the motion.div
+      className="relative w-full h-[350px] sm:h-[400px] flex flex-col p-5 sm:p-6 rounded-3xl 
+      bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-2xl 
+      border border-white/60 dark:border-emerald-500/20 
+      shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(16,185,129,0.1)] 
+      overflow-hidden transition-colors duration-300"
     >
-      <div className="mb-2">
-        <h2 className="text-lg font-bold text-white tracking-tight">Top Expenses</h2>
-        {/* ✅ Updated subtitle to show the 5-month range */}
-        <p className="text-xs sm:text-sm text-gray-500">
-          Categorized spending ({dateRangeText})
-        </p>
-      </div>
+      {/* ✅ 2. The Emerald Bottom Gradient Layer (Sits behind the chart) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-emerald-500/5 to-transparent dark:from-emerald-500/20 dark:via-emerald-500/5 pointer-events-none z-0" />
 
-      <div className="flex-1 w-full relative flex items-center justify-center min-h-[180px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Tooltip content={<CustomTooltip />} cursor={false} />
-            
-            {sortedChartData.map((entry, index) => {
-              const prevSum = sortedChartData.slice(0, index).reduce((sum, d) => sum + d.value, 0);
-              const currentSum = prevSum + entry.value;
-
-              const startAngle = 90 - (prevSum / totalExpenses) * 360;
-              const endAngle = 90 - (currentSum / totalExpenses) * 360;
-
-              return (
-                <Pie
-                  key={`pie-${index}`}
-                  data={[entry]}
-                  dataKey="value"
-                  innerRadius={25} 
-                  outerRadius={BASE_RADIUS + index * SIZE_INCREMENT}
-                  startAngle={startAngle}
-                  endAngle={endAngle}
-                  cornerRadius={6} 
-                  stroke="none" 
-                >
-                  <Cell fill={entry.fill} className="hover:opacity-80 transition-opacity duration-300 outline-none" />
-                </Pie>
-              );
-            })}
-          </PieChart>
-        </ResponsiveContainer>
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-[10px] text-gray-500 font-medium uppercase">Total</span>
-          <span className="text-base sm:text-lg font-bold text-white">
-            {new Intl.NumberFormat("en-IN", { notation: "compact", maximumFractionDigits: 1 }).format(totalExpenses)}
-          </span>
+      {/* ✅ 3. Ensure the content sits ABOVE the gradient layer using z-10 */}
+      <div className="relative z-10 flex flex-col h-full w-full">
+        <div className="mb-2">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Top Expenses</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-emerald-500/70">
+            Categorized spending ({dateRangeText})
+          </p>
         </div>
-      </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 justify-center max-h-[60px] overflow-y-auto 
-        [&::-webkit-scrollbar]:w-1.5 
-        [&::-webkit-scrollbar-track]:bg-transparent 
-        [&::-webkit-scrollbar-thumb]:bg-gray-800 
-        [&::-webkit-scrollbar-thumb]:rounded-full 
-        hover:[&::-webkit-scrollbar-thumb]:bg-gray-600"
-      >
-        {[...sortedChartData].reverse().map((entry, index) => (
-          <div key={index} className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10 shrink-0">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.fill }} />
-            <span className="text-[10px] sm:text-xs font-medium text-gray-300 whitespace-nowrap">{entry.name}</span>
+        <div className="flex-1 w-full relative flex items-center justify-center min-h-[180px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Tooltip content={<CustomTooltip />} cursor={false} />
+              
+              {sortedChartData.map((entry, index) => {
+                const prevSum = sortedChartData.slice(0, index).reduce((sum, d) => sum + d.value, 0);
+                const currentSum = prevSum + entry.value;
+
+                const startAngle = 90 - (prevSum / totalExpenses) * 360;
+                const endAngle = 90 - (currentSum / totalExpenses) * 360;
+
+                return (
+                  <Pie
+                    key={`pie-${index}`}
+                    data={[entry]}
+                    dataKey="value"
+                    innerRadius={25} 
+                    outerRadius={BASE_RADIUS + index * SIZE_INCREMENT}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    cornerRadius={6} 
+                    stroke="none" 
+                  >
+                    <Cell fill={entry.fill} className="hover:opacity-80 transition-opacity duration-300 outline-none" />
+                  </Pie>
+                );
+              })}
+            </PieChart>
+          </ResponsiveContainer>
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-[10px] text-gray-500 dark:text-emerald-500/70 font-medium uppercase">Total</span>
+            <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white drop-shadow-md">
+              {new Intl.NumberFormat("en-IN", { notation: "compact", maximumFractionDigits: 1 }).format(totalExpenses)}
+            </span>
           </div>
-        ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2 justify-center max-h-[60px] overflow-y-auto 
+          [&::-webkit-scrollbar]:w-1.5 
+          [&::-webkit-scrollbar-track]:bg-transparent 
+          [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-emerald-500/30
+          [&::-webkit-scrollbar-thumb]:rounded-full 
+          hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-emerald-500/50"
+        >
+          {[...sortedChartData].reverse().map((entry, index) => (
+            // ✅ Updated badges to blend with the glassmorphism container
+            <div key={index} className="flex items-center gap-1.5 bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-sm px-2 py-1 rounded-md border border-white/60 dark:border-emerald-500/20 shadow-sm shrink-0 transition-colors">
+              <div className="w-2 h-2 rounded-full shadow-[0_0_5px_currentColor]" style={{ backgroundColor: entry.fill, color: entry.fill }} />
+              <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{entry.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </motion.div>
   );

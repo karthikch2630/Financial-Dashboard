@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Trash2, TrendingUp, TrendingDown, Inbox } from "lucide-react";
 import { format } from "date-fns";
 
-export const RecentTrasactions = () => {
+export const RecentTransactions = () => { // ✅ Fixed typo in component name
   const allTransactions = useFilteredTransactions();
   const { role } = useRoleStore();
   const { deleteTransaction } = useTransactionStore();
@@ -20,25 +20,26 @@ export const RecentTrasactions = () => {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black border border-gray-800 p-6 md:p-8 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-2"
+        // ✅ Glassmorphism applied to Empty State
+        className="bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-2xl border border-white/60 dark:border-emerald-500/20 p-6 md:p-8 rounded-[1.5rem] shadow-lg flex flex-col items-center justify-center gap-2 transition-colors duration-300"
       >
-        <div className="p-3 bg-gray-900/50 rounded-full border border-gray-800">
-          <Inbox className="w-6 h-6 text-gray-500" />
+        <div className="p-3 bg-gray-100 dark:bg-gray-900/50 rounded-full border border-gray-200 dark:border-gray-800 transition-colors">
+          <Inbox className="w-6 h-6 text-gray-400 dark:text-gray-500" />
         </div>
-        <p className="text-gray-400 text-sm font-medium">No transactions found</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">No transactions found</p>
       </motion.div>
     );
   }
 
   return (
-    // Reduced container padding (p-4 md:p-5) and sharper corners (rounded-2xl)
-    <div className="bg-black border border-gray-800 p-4 md:p-5 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.4)] overflow-hidden">
+    // ✅ Pure Glassmorphism Container applied here
+    <div className="bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-2xl border border-white/60 dark:border-emerald-500/20 p-4 md:p-5 rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(16,185,129,0.1)] overflow-hidden transition-colors duration-300">
       <div className="overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           
-          {/* 🔹 Table Header - Tighter bottom padding (pb-2.5) */}
+          {/* 🔹 Table Header */}
           <thead>
-            <tr className="border-b border-gray-800/60 text-gray-500 text-xs uppercase tracking-wide">
+            <tr className="border-b border-gray-200 dark:border-gray-800/60 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide transition-colors">
               <th className="pb-2.5 pl-2 font-semibold">Date</th>
               <th className="pb-2.5 px-2 font-semibold">Category</th>
               <th className="pb-2.5 px-2 font-semibold">Type</th>
@@ -49,7 +50,7 @@ export const RecentTrasactions = () => {
             </tr>
           </thead>
 
-          {/* 🔹 Table Body - Smaller text base (text-[13px] / text-sm) */}
+          {/* 🔹 Table Body */}
           <tbody className="text-[13px] md:text-sm">
             <AnimatePresence mode="popLayout">
               {recentTransactions.map((t) => (
@@ -59,26 +60,27 @@ export const RecentTrasactions = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, x: -5, transition: { duration: 0.15 } }}
                   key={t.id} 
-                  className="border-b border-gray-800/40 hover:bg-gray-900/40 transition-colors last:border-0"
+                  // ✅ Row hover effects updated for Light & Dark mode
+                  className="border-b border-gray-100 dark:border-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-900/40 transition-colors last:border-0"
                 >
                   
-                  {/* Date - Tighter vertical padding (py-2.5) */}
-                  <td className="py-2.5 pl-2 text-gray-300 font-medium whitespace-nowrap">
+                  {/* Date */}
+                  <td className="py-2.5 pl-2 text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap transition-colors">
                     {format(new Date(t.date), "MMM dd, yyyy")}
                   </td>
                   
                   {/* Category */}
-                  <td className="py-2.5 px-2 text-gray-400 whitespace-nowrap">
+                  <td className="py-2.5 px-2 text-gray-500 dark:text-gray-400 whitespace-nowrap transition-colors">
                     {t.category}
                   </td>
 
-                  {/* Type Badges - Slimmer padding (px-2 py-0.5) and text-[11px] */}
+                  {/* Type Badges */}
                   <td className="py-2.5 px-2">
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] md:text-xs font-semibold tracking-wide border ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] md:text-xs font-semibold tracking-wide border transition-colors ${
                         t.type === "income"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                          ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20"
+                          : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20"
                       }`}
                     >
                       {t.type === "income" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -87,7 +89,7 @@ export const RecentTrasactions = () => {
                   </td>
 
                   {/* Amount */}
-                  <td className={`py-2.5 px-2 text-right font-bold whitespace-nowrap ${t.type === "income" ? "text-emerald-400" : "text-white"}`}>
+                  <td className={`py-2.5 px-2 text-right font-bold whitespace-nowrap transition-colors ${t.type === "income" ? "text-emerald-600 dark:text-emerald-400" : "text-gray-900 dark:text-white"}`}>
                     {t.type === "income" ? "+" : "-"} ₹{t.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
 
@@ -96,10 +98,10 @@ export const RecentTrasactions = () => {
                     <td className="py-2.5 pr-2 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         
-                        {/* Edit Button - Smaller hit area (p-1.5) and smaller icon (w-3.5 h-3.5) */}
+                        {/* Edit Button */}
                         <button 
                           onClick={() => console.log("Edit:", t.id)}
-                          className="p-1.5 bg-gray-900/50 border border-gray-800 rounded-lg text-gray-500 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all"
+                          className="p-1.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all"
                           title="Edit Transaction"
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -108,7 +110,7 @@ export const RecentTrasactions = () => {
                         {/* Delete Button */}
                         <button 
                           onClick={() => deleteTransaction(t.id)}
-                          className="p-1.5 bg-gray-900/50 border border-gray-800 rounded-lg text-gray-500 hover:text-rose-400 hover:border-rose-500/50 hover:bg-rose-500/10 transition-all"
+                          className="p-1.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-500/50 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
                           title="Delete Transaction"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

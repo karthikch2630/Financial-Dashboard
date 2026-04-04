@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RoleSwitcher } from "../features/role/RoleSwitcher";
 import { useRoleStore } from "../store/roleStore";
+import { useThemeStore } from "../store/themeStore"; // ✅ 1. Import your Zustand theme store
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { AddTransactionModal } from "../features/transactions/components/AddTransactionModal";
 import { Menu, Moon, Sun } from "lucide-react";
@@ -11,8 +12,8 @@ interface HeaderProps {
 
 export const Header = ({ toggleSidebar }: HeaderProps) => {
   const { role } = useRoleStore();
+  const { theme, toggleTheme } = useThemeStore(); // ✅ 2. Use Zustand instead of local useState
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   // ✅ Make sure the theme actually applies to the HTML document
   useEffect(() => {
@@ -43,7 +44,6 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
         
         {/* 🔹 Left - Menu Toggle & Logo */}
         <div className="flex items-center gap-3 md:gap-5">
-          {/* ✅ Added 'hidden md:block' so it disappears on mobile */}
           <button 
             onClick={toggleSidebar}
             className="hidden md:block p-2 -ml-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-900 rounded-xl transition-colors"
@@ -104,7 +104,7 @@ export const Header = ({ toggleSidebar }: HeaderProps) => {
           <motion.button 
             layout 
             transition={springTransition}
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={toggleTheme} // ✅ 3. Call the Zustand toggle function directly
             className="p-2 sm:p-2.5 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-500/10 dark:hover:bg-amber-500/10 transition-all"
             title="Toggle Theme"
           >

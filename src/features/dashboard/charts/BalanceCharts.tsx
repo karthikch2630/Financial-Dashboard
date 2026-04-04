@@ -8,9 +8,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useTransactionStore } from "../../../store/transactionStore";
+import { useThemeStore } from "../../../store/themeStore";
 import { motion } from "framer-motion";
 
-// ✅ Updated Interface to include an internal key
 interface ChartDataPoint {
   key: string;
   month: string;
@@ -31,14 +31,14 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-gray-950 border border-gray-800 p-4 rounded-xl shadow-2xl">
-        <p className="text-gray-400 text-xs font-medium mb-2">{label}</p>
+      <div className="bg-white/80 dark:bg-[#050505]/80 backdrop-blur-md border border-emerald-500/20 p-4 rounded-xl shadow-xl transition-colors">
+        <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mb-2">{label}</p>
         <div className="space-y-1">
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2">
               <div 
-                className="w-2 h-2 rounded-full" 
-                style={{ backgroundColor: entry.color }} 
+                className="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" 
+                style={{ backgroundColor: entry.color, color: entry.color }} 
               />
               <p className="text-sm font-bold" style={{ color: entry.color }}>
                 {entry.name}: {new Intl.NumberFormat("en-IN", {
@@ -56,7 +56,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-// 🔹 Formatter to keep the Y-Axis compact (e.g., 55000 -> 55k)
 const compactCurrency = (value: number) => {
   if (value >= 1000000) return `₹${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
@@ -65,8 +64,8 @@ const compactCurrency = (value: number) => {
 
 export const BalanceChart = () => {
   const { transactions } = useTransactionStore();
+  const { theme } = useThemeStore();
 
-  // 🔹 Data Processing: Sort chronologically, group by Year-Month, limit to last 11
   const chartData = [...transactions]
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) 
     .reduce((acc: ChartDataPoint[], t) => {
@@ -93,85 +92,100 @@ export const BalanceChart = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      // ✅ Removed the extreme h-[400px] and let it fill its grid area cleanly
-      className="bg-[#0a0a0a] p-5 sm:p-6 rounded-2xl border border-gray-800 shadow-lg w-full h-[350px] sm:h-[400px] flex flex-col"
+      // ✅ 1. The Pure Glassmorphism Container
+      className="relative w-full h-[350px] sm:h-[400px] flex flex-col p-5 sm:p-6 rounded-3xl 
+      bg-white/40 dark:bg-[#0a0a0a]/40 backdrop-blur-2xl 
+      border border-white/60 dark:border-emerald-500/20 
+      shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:shadow-[0_8px_30px_rgba(16,185,129,0.1)] 
+      overflow-hidden transition-colors duration-300"
     >
-      <div className="mb-4 sm:mb-6 flex justify-between items-end">
-        <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">Cash Flow</h2>
-          <p className="text-sm text-gray-500 hidden sm:block">Income vs Expenses trend</p>
-        </div>
-        <div className="flex gap-3 sm:gap-4 text-[10px] sm:text-xs font-medium">
-          <div className="flex items-center gap-1.5 text-emerald-400">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
-            Income
+      {/* ✅ 2. The Emerald Bottom Gradient Layer (Sits behind the chart) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/20 via-emerald-500/5 to-transparent dark:from-emerald-500/20 dark:via-emerald-500/5 pointer-events-none z-0" />
+
+      {/* ✅ 3. Ensure the content sits ABOVE the gradient layer using z-10 */}
+      <div className="relative z-10 flex flex-col h-full w-full">
+        <div className="mb-4 sm:mb-6 flex justify-between items-end">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Cash Flow</h2>
+            <p className="text-sm text-gray-500 dark:text-emerald-500/70 hidden sm:block">Income vs Expenses trend</p>
           </div>
-          <div className="flex items-center gap-1.5 text-rose-400">
-            <div className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_#fb7185]" />
-            Expenses
+          <div className="flex gap-3 sm:gap-4 text-[10px] sm:text-xs font-medium">
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              Income
+            </div>
+            <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400">
+              <div className="w-2 h-2 rounded-full bg-rose-400 dark:bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
+              Expenses
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex-1 w-full min-h-[200px]">
-        <ResponsiveContainer width="100%" height="100%">
-          {/* ✅ 1. Added bottom: 15 margin to prevent clipping the tilted text */}
-          <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 15 }}>
-            <defs>
-              <filter id="glow-balance" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="4" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
+        <div className="flex-1 w-full min-h-[200px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 15 }}>
+              <defs>
+                <filter id="glow-balance" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
 
-            <CartesianGrid vertical={false} stroke="#1f2937" strokeDasharray="3 3" />
-            
-            {/* 🌟 THE FIX IS HERE 🌟 */}
-            <XAxis 
-              dataKey="month" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: "#6b7280", fontSize: 10 }} // Made font slightly smaller for mobile
-              tickMargin={10}
-              interval={0}        // ✅ Forces ALL months to be visible
-              angle={-45}         // ✅ Tilts the text by 45 degrees
-              textAnchor="end"    // ✅ Ensures the tilted text aligns nicely with the tick mark
-              height={40}         // ✅ Explicitly gives the X-axis vertical space so the text doesn't get cut off
-            />
-            
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: "#6b7280", fontSize: 12 }}
-              tickFormatter={compactCurrency} 
-              width={60} 
-            />
-            
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#374151', strokeWidth: 1 }} />
+              <CartesianGrid 
+                vertical={false} 
+                stroke={theme === "dark" ? "rgba(16, 185, 129, 0.1)" : "#e5e7eb"} 
+                strokeDasharray="3 3" 
+              />
+              
+              <XAxis 
+                dataKey="month" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: theme === "dark" ? "rgba(16, 185, 129, 0.6)" : "#9ca3af", fontSize: 10 }}
+                tickMargin={10}
+                interval={0}
+                angle={-45}
+                textAnchor="end"
+                height={40}
+              />
+              
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: theme === "dark" ? "rgba(16, 185, 129, 0.6)" : "#9ca3af", fontSize: 12 }}
+                tickFormatter={compactCurrency} 
+                width={60} 
+              />
+              
+              <Tooltip 
+                content={<CustomTooltip />} 
+                cursor={{ stroke: theme === 'dark' ? 'rgba(16, 185, 129, 0.3)' : '#e5e7eb', strokeWidth: 1 }} 
+              />
 
-            <Line
-              name="Income"
-              type="monotone"
-              dataKey="income"
-              stroke="#10b981"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, fill: "#10b981", stroke: "#fff", strokeWidth: 2 }}
-              filter="url(#glow-balance)"
-            />
+              <Line
+                name="Income"
+                type="monotone"
+                dataKey="income"
+                stroke="#10b981"
+                strokeWidth={3}
+                dot={false}
+                activeDot={{ r: 6, fill: "#10b981", stroke: theme === "dark" ? "#0a0a0a" : "#fff", strokeWidth: 2 }}
+                filter="url(#glow-balance)"
+              />
 
-            <Line
-              name="Expenses"
-              type="monotone"
-              dataKey="expense"
-              stroke="#fb7185"
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 6, fill: "#fb7185", stroke: "#fff", strokeWidth: 2 }}
-              filter="url(#glow-balance)"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+              <Line
+                name="Expenses"
+                type="monotone"
+                dataKey="expense"
+                stroke="#fb7185"
+                strokeWidth={3}
+                dot={false}
+                activeDot={{ r: 6, fill: "#fb7185", stroke: theme === "dark" ? "#0a0a0a" : "#fff", strokeWidth: 2 }}
+                filter="url(#glow-balance)"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ✅ Make the base background dark so there is no white flash on load */
+body {
+  background-color: #050505; /* Your dark mode background color */
+  color: #ffffff;
+}
+
+/* Light mode overrides */
+html:not(.dark) body {
+  background-color: #f9fafb; /* Tailwind gray-50 */
+  color: #111827; /* Tailwind gray-900 */
+}
